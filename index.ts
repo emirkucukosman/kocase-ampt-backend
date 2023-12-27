@@ -1,18 +1,21 @@
-import { http, ws, SocketConnection } from "@ampt/sdk";
+import { Server } from "socket.io";
 import express, { Router } from "express";
+import { http } from "@ampt/sdk";
 
 const app = express();
+const socket = new Server();
 
-const api = Router();
+const router = Router();
 
-api.get("/", (req, res) => {
-  return res.status(200).send({ success: true });
+router.get("/", (req, res) => {
+  res.send("Hello World");
 });
 
-app.use("/api", api);
-
-ws.on("connected", (socket: SocketConnection) => {
-  console.log("Socket connected", socket.connectionId);
+socket.on("connection", (socket) => {
+  console.log("Connected", socket.id);
 });
+
+app.use(router);
 
 http.node.use(app);
+http.node.use(socket);
